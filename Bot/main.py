@@ -64,7 +64,10 @@ async def on_ready():
 
 async def update_leaderboard():
     for message in state.leaderboard:
-        await message.delete()
+        try:
+            await message.delete()
+        except discord.errors.NotFound:
+            pass
     messages = []
     for channel_id in state.channels["leaderboard"]:
         channel = bot.get_channel(channel_id)
