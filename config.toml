@@ -1,0 +1,56 @@
+api = "http://localhost:5000/api"
+
+[channels]
+leaderboard = [
+]
+lobby = [
+  739093044346748948, # scrim-chat
+]
+spam = [
+  731269742870003764, # bot-spam
+]
+
+[roles]
+organiser = [
+  731288359120404562, # Scrim Organiser
+  731263165480042498, # Administrator
+  731287455184977994, # Moderator
+]
+ranked = [
+]
+
+[[ranks]]
+color = "peru"
+id = 0
+limit = 1000
+name = "Bronze"
+
+[[ranks]]
+color = "silver"
+id = 0
+limit = 1500
+name = "Silver"
+
+[[ranks]]
+color = "gold"
+id = 0
+limit = 2000
+name = "Gold"
+
+[[ranks]]
+color = "cyan"
+id = 0
+limit = 2500
+name = "Platinum"
+
+[[ranks]]
+color = "blue"
+id = 0
+limit = 3500
+name = "Diamond"
+
+[[ranks]]
+color = "red"
+id = 0
+limit = 5000
+name = "Master"
