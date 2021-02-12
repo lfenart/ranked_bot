@@ -18,4 +18,6 @@ class Player:
     def rating_change(self, game_id):
         previous_ratings = list(
             filter(lambda x: x[0] <= game_id, self.history))[-2:]
+        if len(previous_ratings) < 2:
+            return previous_ratings[0][1] - Player().conservative_rating()
         return previous_ratings[1][1] - previous_ratings[0][1]
