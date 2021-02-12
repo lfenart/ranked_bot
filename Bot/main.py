@@ -292,7 +292,7 @@ async def score(ctx, id: int, team: str):
     state.api.update_game(game)
     state.update_players()
     await update_leaderboard()
-    await ctx.send(f"Game {id} updated.")
+    await _gameinfo(ctx, game)
 
 
 @bot.command(aliases=['cancel'])
@@ -306,6 +306,7 @@ async def cancelgame(ctx, id: int):
     state.api.update_game(game)
     state.update_players()
     await update_leaderboard()
+    await ctx.send("Game cancelled.")
 
 
 @bot.command(aliases=['lb'])
@@ -373,7 +374,7 @@ async def queue(ctx):
 
 
 async def _gameinfo(ctx, game: Game):
-    title = "Game #{}".format(game.id)
+    title = f"Game #{game.id}"
     winner = "undecided"
     if game.score == Result.TEAM1:
         winner = "team 1"
@@ -383,15 +384,37 @@ async def _gameinfo(ctx, game: Game):
         winner = "draw"
     elif game.score == Result.CANCELLED:
         winner = "cancelled"
-    description = "{}\n\nWinner: {}\n\nTeam 1:".format(
+    description = "{}\n\nWinner: {}\n\nTeam 1:\n".format(
         game.date.replace('T', ' '), winner)
-    for player in game.team1:
-        name = "<@" + str(player) + ">"
-        description += "\n{}".format(name)
-    description += "\n\nTeam 2:"
-    for player in game.team2:
-        name = "<@" + str(player) + ">"
-        description += "\n{}".format(name)
+    for player_id in game.team1:
+        player = state.get_player(player_id)
+        rating_change = player.rating_change(game.id)
+        sign = "+"
+        if rating_change < 0:
+            sign = "-"
+            rating_change = -rating_change
+        member = ctx.guild.get_member(player_id)
+        if member:
+            description += "{} {}{:.0f}\n".format(
+                member.mention, sign, rating_change)
+        else:
+            description += "<@{}> {}{:.0f}\n".format(
+                player_id, sign, rating_change)
+    description += "\nTeam 2:\n"
+    for player_id in game.team2:
+        player = state.get_player(player_id)
+        rating_change = player.rating_change(game.id)
+        sign = "+"
+        if rating_change < 0:
+            sign = "-"
+            rating_change = -rating_change
+        member = ctx.guild.get_member(player_id)
+        if member:
+            description += "{} {}{:.0f}\n".format(
+                member.mention, sign, rating_change)
+        else:
+            description += "<@{}> {}{:.0f}\n".format(
+                player_id, sign, rating_change)
     embed = discord.Embed(title=title, description=description)
     await ctx.send(embed=embed)
 
