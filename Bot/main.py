@@ -386,33 +386,30 @@ async def _gameinfo(ctx, game: Game):
         winner = "cancelled"
     description = "{}\n\nWinner: {}\n\nTeam 1:\n".format(
         game.date.replace('T', ' '), winner)
-    for player_id in game.team1:
-        player = state.get_player(player_id)
-        rating_change = player.rating_change(game.id)
-        sign = "+"
-        if rating_change < 0:
-            sign = "-"
-            rating_change = -rating_change
-        member = ctx.guild.get_member(player_id)
-        if member:
-            description += "{} {}{:.0f}\n".format(
-                member.mention, sign, rating_change)
-        else:
+    if game.score == Result.UNDECIDED or game.score == Result.CANCELLED:
+        for player_id in game.team1:
+            description += "<@{}>\n".format(player_id)
+        description += "\nTeam2:\n"
+        for player_id in game.team2:
+            description += "<@{}>\n".format(player_id)
+    else:
+        for player_id in game.team1:
+            player = state.get_player(player_id)
+            rating_change = player.rating_change(game.id)
+            sign = "+"
+            if rating_change < 0:
+                sign = "-"
+                rating_change = -rating_change
             description += "<@{}> {}{:.0f}\n".format(
                 player_id, sign, rating_change)
-    description += "\nTeam 2:\n"
-    for player_id in game.team2:
-        player = state.get_player(player_id)
-        rating_change = player.rating_change(game.id)
-        sign = "+"
-        if rating_change < 0:
-            sign = "-"
-            rating_change = -rating_change
-        member = ctx.guild.get_member(player_id)
-        if member:
-            description += "{} {}{:.0f}\n".format(
-                member.mention, sign, rating_change)
-        else:
+        description += "\nTeam 2:\n"
+        for player_id in game.team2:
+            player = state.get_player(player_id)
+            rating_change = player.rating_change(game.id)
+            sign = "+"
+            if rating_change < 0:
+                sign = "-"
+                rating_change = -rating_change
             description += "<@{}> {}{:.0f}\n".format(
                 player_id, sign, rating_change)
     embed = discord.Embed(title=title, description=description)
