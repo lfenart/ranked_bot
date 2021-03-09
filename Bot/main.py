@@ -169,7 +169,7 @@ async def rebalance(ctx, *args):
         except:
             await ctx.send("Wrong number of arguments.")
             return
-        player_id = int(player[3:-1])
+        player_id = int(player)
         if player_id not in game.team1 + game.team2:
             player = ctx.guild.get_member(player_id)
             message = "{} is not in the game.".format(player.mention)
