@@ -1,6 +1,6 @@
 from api import Api
 from game import Game, Result
-from player import Player
+from player import Player, env
 from typing import Optional
 import trueskill
 
@@ -72,7 +72,7 @@ def update_ratings(players: dict, game: Game) -> None:
     def get_rating(x): return players[x].rating
     team1_ratings = list(map(get_rating, game.team1))
     team2_ratings = list(map(get_rating, game.team2))
-    team1_ratings, team2_ratings = trueskill.rate(
+    team1_ratings, team2_ratings = env.rate(
         [team1_ratings, team2_ratings], ranks=ranks)
     for i, player in enumerate(game.team1):
         players[player].rating = team1_ratings[i]

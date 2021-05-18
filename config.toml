@@ -2,6 +2,7 @@ api = "http://localhost:5000/api"
 
 [channels]
 leaderboard = [
+  809594511461711882, # leaderboard
 ]
 lobby = [
   739093044346748948, # scrim-chat
@@ -17,6 +18,7 @@ organiser = [
   731287455184977994, # Moderator
 ]
 ranked = [
+  809594814378016818, # Ranked
 ]
 
 [[ranks]]

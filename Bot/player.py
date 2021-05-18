@@ -1,8 +1,12 @@
 import trueskill
 
+env = trueskill.TrueSkill(mu=2500, sigma=2500/3,
+                          beta=2500/6, tau=25, draw_probability=0.085)
+DEFAULT_RATING = env.create_rating()
+
 
 class Player:
-    def __init__(self, rating=trueskill.Rating()):
+    def __init__(self, rating=DEFAULT_RATING):
         self.rating = rating
         self.wins = 0
         self.losses = 0
@@ -10,7 +14,7 @@ class Player:
         self.history = []
 
     def conservative_rating(self):
-        return 100 * self.rating.mu - 200 * self.rating.sigma
+        return self.rating.mu - 2 * self.rating.sigma
 
     def add_rating(self, game_id: int) -> None:
         self.history.append((game_id, self.conservative_rating()))

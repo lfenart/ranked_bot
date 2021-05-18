@@ -13,7 +13,7 @@ import matplotlib.pyplot as plt
 from state import State
 from api import Api
 from game import Game, Result
-from player import Player
+from player import Player, env
 
 intents = discord.Intents.default()
 intents.members = True
@@ -100,15 +100,16 @@ def balance(queue, estimates=None):
     for team1 in itertools.combinations(queue[1:], size - 1):
         team1 = queue[:1] + list(team1)
         team2 = [x for x in queue if x not in team1]
+        def get_player(x): return state.get_player(x) or Player()
         if estimates is None:
-            def get_rating(x): return (state.get_player(x) or Player()).rating
+            def get_rating(x): return get_player(x).rating
         else:
             def get_rating(x): return trueskill.Rating(
-                mu=estimates[x], sigma=2) if x in estimates else (state.get_player(x) or Player()).rating
+                mu=estimates[x], sigma=get_player(x).sigma) if x in estimates else get_player(x).rating
 
         team1_rating = list(map(get_rating, team1))
         team2_rating = list(map(get_rating, team2))
-        score = trueskill.quality([team1_rating, team2_rating])
+        score = env.quality([team1_rating, team2_rating])
         if score > best_score:
             best_score = score
             best_teams = (team1, team2)
@@ -175,8 +176,8 @@ async def rebalance(ctx, *args):
             message = "{} is not in the game.".format(player.mention)
             await ctx.send(message)
             return
-        rating = int(rating) / 100
-        if rating < 0 or rating > 50:
+        rating = int(rating)
+        if rating < 0 or rating > 5000:
             await ctx.send("Rating should be between 0 and 5000.")
             return
         estimates[int(player[3:-1])] = rating
@@ -323,8 +324,8 @@ async def leaderboard(ctx, page=1):
     for (i, player) in enumerate(players[start:start+20], start + 1):
         name = player[0].mention
         conservative_rating = player[1].conservative_rating()
-        mu = 100 * player[1].rating.mu
-        sigma = 200 * player[1].rating.sigma
+        mu = player[1].rating.mu
+        sigma = 2 * player[1].rating.sigma
         description += "{}: {} - **{:.0f}** ({:.0f} ± {:.0f})\n".format(
             i, name, conservative_rating, mu, sigma)
     embed = discord.Embed(
@@ -346,8 +347,8 @@ async def lball(ctx, page=1):
     for (i, player) in enumerate(players[start:start+20], start + 1):
         name = player[0].mention
         conservative_rating = player[1].conservative_rating()
-        mu = 100 * player[1].rating.mu
-        sigma = 200 * player[1].rating.sigma
+        mu = player[1].rating.mu
+        sigma = 2 * player[1].rating.sigma
         description += "{}: {} - **{:.0f}** ({:.0f} ± {:.0f})\n".format(
             i, name, conservative_rating, mu, sigma)
     embed = discord.Embed(
@@ -440,8 +441,8 @@ async def _info(ctx, user: discord.User):
     player = (state.get_player(user.id) or Player())
     rating = player.rating
     conservative_rating = player.conservative_rating()
-    mu = 100 * rating.mu
-    sigma = 200 * rating.sigma
+    mu = rating.mu
+    sigma = 2 * rating.sigma
     title = "{}'s stats".format(user.display_name)
     description = "Rating: {:.0f} ({:.0f} ± {:.0f})\n".format(
         conservative_rating, mu, sigma)
