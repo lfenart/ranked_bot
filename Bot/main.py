@@ -81,8 +81,8 @@ async def update_leaderboard():
             for (i, player) in enumerate(players[start:start+20], start + 1):
                 name = player[0].mention
                 conservative_rating = player[1].conservative_rating()
-                mu = 100 * player[1].rating.mu
-                sigma = 200 * player[1].rating.sigma
+                mu = player[1].rating.mu
+                sigma = 2 * player[1].rating.sigma
                 description += "{}: {} - **{:.0f}** ({:.0f} ± {:.0f})\n".format(
                     i, name, conservative_rating, mu, sigma)
             embed = discord.Embed(
