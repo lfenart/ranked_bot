@@ -160,7 +160,7 @@ async def start_game(ctx):
 @bot.command()
 @commands.check(check_organiser_lobby)
 async def rebalance(ctx, *args):
-    game = api.get_last_game()
+    game = state.api.get_last_game()
     if not game:
         return
     estimates = {}
@@ -184,7 +184,7 @@ async def rebalance(ctx, *args):
     (team1, team2), quality = balance(game.team1 + game.team2, estimates)
     game.team1 = team1
     game.team2 = team2
-    api.update_game(game)
+    state.api.update_game(game)
     title = "Game #{}".format(game.id)
     description = "Quality: {:.0f}\n".format(100 * quality)
     description += "\nTeam 1:\n"
@@ -664,7 +664,6 @@ async def unfreeze(ctx):
 
 load_dotenv()
 config = toml.load("config.toml")
-api = Api("http://localhost:5000/api")
 state = State(config)
 state.update_players()
 bot.run(os.getenv('DISCORD_TOKEN'))
